@@ -1,0 +1,156 @@
+openapi: 3.0.3
+info:
+  title: Order API
+  version: 1.0.0
+
+paths:
+  # Create Order
+  /orders:
+    post:
+      tags:
+        - orders
+      summary: Create a new order
+      operationId: createOrder
+      description: Endpoint to create a new order in the system
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Order'
+            example:
+              customerId: "cust123"
+              items:
+                - productId: "prod001"
+                  quantity: 2
+                - productId: "prod002"
+                  quantity: 1
+              notes: "Please deliver between 9 AM and 5 PM"
+      responses:
+        "201":
+          description: Order successfully created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  orderId:
+                    type: string
+                  status:
+                    type: string
+              example:
+                orderId: "order456"
+                status: "created"
+        "400":
+          description: Invalid input
+
+  # Get Order by ID
+  /orders/{orderId}:
+    get:
+      tags:
+        - orders
+      summary: Retrieve an order by ID
+      operationId: getOrder
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the order to retrieve
+      responses:
+        "200":
+          description: Order details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+              example:
+                orderId: "order456"
+                customerId: "cust123"
+                items:
+                  - productId: "prod001"
+                    quantity: 2
+                notes: "Please deliver between 9 AM and 5 PM"
+                status: "created"
+        "404":
+          description: Order not found
+
+    # Update Order by ID
+    put:
+      tags:
+        - orders
+      summary: Update an existing order by ID
+      operationId: updateOrder
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the order to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Order'
+      responses:
+        "200":
+          description: Order updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  orderId:
+                    type: string
+                  status:
+                    type: string
+              example:
+                orderId: "order456"
+                status: "updated"
+        "400":
+          description: Invalid input
+        "404":
+          description: Order not found
+
+components:
+  schemas:
+    Order:
+      type: object
+      required:
+        - customerId
+        - items
+      properties:
+        customerId:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+        notes:
+          type: string
+          description: Optional notes for the order
+
+    OrderItem:
+      type: object
+      required:
+        - productId
+        - quantity
+      properties:
+        productId:
+          type: string
+        quantity:
+          type: integer
+          minimum: 1
+
+    OrderResponse:
+      allOf:
+        - $ref: '#/components/schemas/Order'
+        - type: object
+          properties:
+            orderId:
+              type: string
+            status:
+              type: string
