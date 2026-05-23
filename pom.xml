@@ -8,9 +8,7 @@
 
     <properties>
           <springboot.version>3.5.14</springboot.version>
-    </properties>
-    <properties>
-        <java.version>17</java.version>
+          <java.version>17</java.version>
     </properties>
     <dependencies>
         <dependency>
